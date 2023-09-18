@@ -6,7 +6,7 @@ pygame.init()
 # create the screen
 screen = pygame.display.set_mode((800, 600))
 
-# Title and Icon
+# Caption and Icon
 pygame.display.set_caption(" 🚀 Space Invaders 👾")
 icon = pygame.image.load('spaceship.png')
 pygame.display.set_icon(icon)
@@ -21,14 +21,19 @@ def player():
     screen.blit(playerImg, (playerX, playerY))
 
 # Game Loop
+
 running = True
 while running:
-    # screen as RGB
-    screen.fill((128, 0, 128))
+
+    # RGB parameters
+    screen.fill((255, 0, 255))
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
 
-player()
-pygame.display.update()
+    player()
+    pygame.display.update()
+
+pygame.quit()
