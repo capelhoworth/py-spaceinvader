@@ -15,6 +15,7 @@ pygame.display.set_icon(icon)
 playerImg = pygame.image.load('space-invaders.png')
 playerX = 370
 playerY = 480
+playerX_change = 0
 
 
 def player(x, y): 
@@ -27,12 +28,31 @@ while running:
 
     # RGB parameters
     screen.fill((255, 0, 255))
-    playerX -= 0.1
-    print(playerX)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+
+        # if keystroke is pressed, check if it's right or left
+        if event.type == pygame.KEYDOWN:
+            print ("A keystroke is pressed")
+            if event.key == pygame.K_LEFT:
+                playerX_change = -0.5
+            if event.key == pygame.K_RIGHT:
+                playerX_change = 0.5
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                playerX_change = 0
+
+
+    playerX += playerX_change
+
+    # set player boundaries
+    if playerX <= 0:
+        playerX = 0
+    elif playerX >= 736:
+        playerX = 736
 
     player(playerX, playerY)
     pygame.display.update()
