@@ -17,8 +17,8 @@ playerX = 370
 playerY = 480
 
 
-def player(): 
-    screen.blit(playerImg, (playerX, playerY))
+def player(x, y): 
+    screen.blit(playerImg, (x, y))
 
 # Game Loop
 
@@ -27,13 +27,14 @@ while running:
 
     # RGB parameters
     screen.fill((255, 0, 255))
-
+    playerX -= 0.1
+    print(playerX)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
 
-    player()
+    player(playerX, playerY)
     pygame.display.update()
 
 pygame.quit()
