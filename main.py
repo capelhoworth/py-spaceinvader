@@ -16,6 +16,7 @@ background = pygame.image.load("space.png")
 mixer.music.load('Sexy Scifi.wav')
 mixer.music.play(-1)
 
+
 # Caption and Icon
 pygame.display.set_caption(" 🚀 Space Invaders 👾")
 icon = pygame.image.load('spaceship.png')
@@ -39,7 +40,7 @@ for i in range(num_of_enemies):
     enemyImg.append(pygame.image.load('enemy.png'))
     enemyX.append(random.randint(0, 735))
     enemyY.append(random.randint(50, 150))
-    enemyX_change.append(0.8)
+    enemyX_change.append(3)
     enemyY_change.append(40)
 
 # Bullet
@@ -50,16 +51,25 @@ bulletX_change = 0
 bulletY_change = 6
 bullet_state = "ready"
 
-# Score
+# Score Text
 score_value = 0
 font = pygame.font.Font('arcade.ttf', 50)
 textX = 10
 textY = 10
 
+# Game Over Text
+over_font = pygame.font.Font('arcade.ttf', 100)
+
 
 def show_score(x, y):
     score = font.render("Score: " + str(score_value), True, (255, 255, 255))
     screen.blit(score, (x, y))
+
+
+def game_over_text(x, y):
+    over_text = over_font.render("GAME OVER", True, (255, 255, 255))
+    screen.blit(over_text, (200, 250))
+
 
 def player(x, y): 
     screen.blit(playerImg, (x, y))
@@ -101,9 +111,9 @@ while running:
         if event.type == pygame.KEYDOWN:
             print ("A keystroke is pressed")
             if event.key == pygame.K_LEFT:
-                playerX_change = -1
+                playerX_change = -5
             if event.key == pygame.K_RIGHT:
-                playerX_change = 1 
+                playerX_change = 5
             if event.key == pygame.K_SPACE:
                 if bullet_state == "ready":
                     bullet_Sound = mixer.Sound('Pew.wav')
@@ -127,12 +137,20 @@ while running:
 
     # Enemy Movement
     for i in range(num_of_enemies):
+
+        # Game Over Man, Game Over
+        if enemyY[i] > 400:
+            for j in range(num_of_enemies):
+                enemyY[j] = 2000
+            game_over_text(250, 250)
+            break
+
         enemyX[i] += enemyX_change[i]
         if enemyX[i] <= 0:
-            enemyX_change[i] = 0.8
+            enemyX_change[i] = 3
             enemyY[i] += enemyY_change[i]
         elif enemyX[i] >= 736:
-            enemyX_change[i] = -0.8
+            enemyX_change[i] = -3
             enemyY[i] += enemyY_change[i]
 
         # Collision
