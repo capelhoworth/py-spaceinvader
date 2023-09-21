@@ -10,11 +10,17 @@ pygame.init()
 mixer.init()
 
 # create the screen
-screen = pygame.display.set_mode((800, 600))
+screen_height = 600
+screen_width = 800
+screen = pygame.display.set_mode((screen_width, screen_height))
+
+# Window Display
+pygame.display.set_caption(" 🚀 Space Invaders 👾")
+icon = pygame.image.load('game-images/spaceship.png')
+pygame.display.set_icon(icon)
 
 # Background
-background = pygame.image.load("space.png")
-
+background = pygame.image.load("game-images/space.png")
 
 # Load audio files
 mixer.music.load('Sexy Scifi.wav')
@@ -28,20 +34,18 @@ boom_volume = 0.3
 
 # Play the theme sound with the initial volume
 mixer.music.set_volume(theme_volume)
-mixer.music.play(-1)  # Loop the theme indefinitely
+mixer.music.play(-1)
 
-# # Mixer Channels
-# theme = pygame.mixer.Channel1(0)
-# pew = pygame.mixer.Channel2(1)
-# boom = pygame.mixer.Channel3(2)
-
-# Caption and Icon
-pygame.display.set_caption(" 🚀 Space Invaders 👾")
-icon = pygame.image.load('spaceship.png')
-pygame.display.set_icon(icon)
+# Mute Buttons for Theme and Sound FX
+theme_button = pygame.image.load('buttons/theme-button.png')
+theme_mute_button = pygame.image.load('buttons/mute-theme.png')
+sound_effects_button = pygame.image.load('buttons/soundFX-button.png')
+sound_effects_mute_button = pygame.image.load('buttons/ninja.png')
+mute_theme = False
+mute_sound_effects = False
 
 # Player
-playerImg = pygame.image.load('space-invaders.png')
+playerImg = pygame.image.load('game-images/space-invaders.png')
 playerX = 370
 playerY = 480
 playerX_change = 0
@@ -55,14 +59,14 @@ enemyX_change = []
 enemyY_change = []
 num_of_enemies = 6
 for i in range(num_of_enemies):
-    enemyImg.append(pygame.image.load('enemy.png'))
+    enemyImg.append(pygame.image.load('game-images/enemy.png'))
     enemyX.append(random.randint(0, 735))
     enemyY.append(random.randint(50, 150))
     enemyX_change.append(3)
     enemyY_change.append(40)
 
 # Bullet
-bulletImg = pygame.image.load('laser.png')
+bulletImg = pygame.image.load('game-images/laser.png')
 bulletX = 0
 bulletY = 480
 bulletX_change = 0
@@ -87,6 +91,24 @@ def show_score(x, y):
 def game_over_text(x, y):
     over_text = over_font.render("GAME OVER", True, (255, 255, 255))
     screen.blit(over_text, (200, 250))
+
+
+
+def draw_mute_buttons():
+    # Mute Theme Button
+    pygame.draw.rect(screen, (255, 255, 255), (10, 10, 50, 30))  # Background rectangle
+    pygame.draw.rect(screen, (0, 0, 0), (10, 10, 50, 30), 2)  # Border rectangle
+    theme_button_text = "🔇" if mute_theme else "🔈"
+    font = pygame.font.Font(None, 36)
+    text = font.render(theme_button_text, True, (0, 0, 0))
+    screen.blit(text, (20, 15))
+
+    # Mute Sound Effects Button
+    pygame.draw.rect(screen, (255, 255, 255), (70, 10, 50, 30))  # Background rectangle
+    pygame.draw.rect(screen, (0, 0, 0), (70, 10, 50, 30), 2)  # Border rectangle
+    sound_effects_button_text = "💥" if mute_sound_effects else "🤫"
+    text = font.render(sound_effects_button_text, True, (0, 0, 0))
+    screen.blit(text, (80, 15))
 
 
 def player(x, y): 
@@ -143,6 +165,24 @@ while running:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 playerX_change = 0
 
+        # if mouse clicks mute buttons
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if 10 <= event.pos[0] <= 60 and 10 <= event.pos[1] <= 40:
+                mute_theme = not mute_theme
+                if mute_theme:
+                    mixer.music.set_volume(0)  # Mute the theme
+                else:
+                    mixer.music.set_volume(theme_volume)  # Unmute the theme
+
+            elif 70 <= event.pos[0] <= 120 and 10 <= event.pos[1] <= 40:
+                mute_sound_effects = not mute_sound_effects
+                if mute_sound_effects:
+                    pew_sound.set_volume(0)  # Mute sound effects
+                    boom_sound.set_volume(0)
+                else:
+                    pew_sound.set_volume(pew_volume)  # Unmute sound effects
+                    boom_sound.set_volume(boom_volume)
+
 
     # set player boundaries
     playerX += playerX_change
@@ -195,6 +235,7 @@ while running:
 
     player(playerX, playerY)
     show_score(textX, textY)
+    draw_mute_buttons()
     pygame.display.update()
 
 pygame.quit()
