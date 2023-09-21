@@ -6,16 +6,34 @@ from pygame import mixer
 # Initialize pygame
 pygame.init()
 
+# Initialize mixer
+mixer.init()
+
 # create the screen
 screen = pygame.display.set_mode((800, 600))
 
 # Background
 background = pygame.image.load("space.png")
 
-# Background Sound
-mixer.music.load('Sexy Scifi.wav')
-mixer.music.play(-1)
 
+# Load audio files
+mixer.music.load('Sexy Scifi.wav')
+pew_sound = mixer.Sound('Pew.wav')
+boom_sound = mixer.Sound('Boom.wav')
+
+# Set initial volume levels
+theme_volume = 1.0
+pew_volume = 0.3
+boom_volume = 0.3
+
+# Play the theme sound with the initial volume
+mixer.music.set_volume(theme_volume)
+mixer.music.play(-1)  # Loop the theme indefinitely
+
+# # Mixer Channels
+# theme = pygame.mixer.Channel1(0)
+# pew = pygame.mixer.Channel2(1)
+# boom = pygame.mixer.Channel3(2)
 
 # Caption and Icon
 pygame.display.set_caption(" 🚀 Space Invaders 👾")
@@ -116,8 +134,8 @@ while running:
                 playerX_change = 5
             if event.key == pygame.K_SPACE:
                 if bullet_state == "ready":
-                    bullet_Sound = mixer.Sound('Pew.wav')
-                    bullet_Sound.play()
+                    pew_sound.set_volume(pew_volume)
+                    pew_sound.play()
                     bulletX = playerX
                     fire_bullet(bulletX, bulletY)
 
@@ -156,8 +174,8 @@ while running:
         # Collision
         collision = isCollision(enemyX[i], enemyY[i], bulletX, bulletY)
         if collision:
-            explosion_Sound = mixer.Sound('Boom.wav')
-            explosion_Sound.play()
+            boom_sound.set_volume(boom_volume)
+            boom_sound.play()
             bulletY = 480
             bullet_state = "ready"
             score_value += 1
