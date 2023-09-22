@@ -31,18 +31,12 @@ boom_sound = mixer.Sound('Boom.wav')
 theme_volume = 1.0
 pew_volume = 0.3
 boom_volume = 0.3
+pew_sound.set_volume(pew_volume)
+boom_sound.set_volume(boom_volume)
 
 # Play the theme sound with the initial volume
 mixer.music.set_volume(theme_volume)
 mixer.music.play(-1)
-
-# Mute Buttons for Theme and Sound FX
-theme_button = pygame.image.load('buttons/theme-button.png')
-theme_mute_button = pygame.image.load('buttons/mute-theme.png')
-sound_effects_button = pygame.image.load('buttons/soundFX-button.png')
-sound_effects_mute_button = pygame.image.load('buttons/ninja.png')
-mute_theme = False
-mute_sound_effects = False
 
 # Player
 playerImg = pygame.image.load('game-images/space-invaders.png')
@@ -93,22 +87,29 @@ def game_over_text(x, y):
     screen.blit(over_text, (200, 250))
 
 
+# Button Class
+class Button():
+    def __init__(self, x, y, image, image_muted):
+        self.image = image
+        self.image_muted = image_muted
+        self.rect = self.image.get_rect()
+        self.rect.topright = (x, y)
+        self.is_muted = False
+    
+    def draw(self):
+        if self.is_muted:
+            screen.blit(self.image_muted, (self.rect.x, self.rect.y))
+        else:
+            screen.blit(self.image, (self.rect.x, self.rect.y))
 
-def draw_mute_buttons():
-    # Mute Theme Button
-    pygame.draw.rect(screen, (255, 255, 255), (10, 10, 50, 30))  # Background rectangle
-    pygame.draw.rect(screen, (0, 0, 0), (10, 10, 50, 30), 2)  # Border rectangle
-    theme_button_text = "🔇" if mute_theme else "🔈"
-    font = pygame.font.Font(None, 36)
-    text = font.render(theme_button_text, True, (0, 0, 0))
-    screen.blit(text, (20, 15))
+# Button Instances
+theme_button = pygame.image.load('buttons/theme-button.png')
+theme_mute_button = pygame.image.load('buttons/mute-theme.png')
+sfx_button = pygame.image.load('buttons/soundFX-button.png')
+sfx_mute_button = pygame.image.load('buttons/ninja.png')
 
-    # Mute Sound Effects Button
-    pygame.draw.rect(screen, (255, 255, 255), (70, 10, 50, 30))  # Background rectangle
-    pygame.draw.rect(screen, (0, 0, 0), (70, 10, 50, 30), 2)  # Border rectangle
-    sound_effects_button_text = "💥" if mute_sound_effects else "🤫"
-    text = font.render(sound_effects_button_text, True, (0, 0, 0))
-    screen.blit(text, (80, 15))
+theme_playing_button = Button(700, 10, theme_button, theme_mute_button)
+sfx_playing_button = Button(730, 10, sfx_button, sfx_mute_button)
 
 
 def player(x, y): 
@@ -141,6 +142,9 @@ while running:
     screen.fill((255, 0, 255))
     # Background Image
     screen.blit(background, (0, 0))
+    # Draw buttons before other elements
+    theme_playing_button.draw()
+    sfx_playing_button.draw()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -149,7 +153,6 @@ while running:
 
         # if keystroke is pressed, check if it's right or left
         if event.type == pygame.KEYDOWN:
-            print ("A keystroke is pressed")
             if event.key == pygame.K_LEFT:
                 playerX_change = -5
             if event.key == pygame.K_RIGHT:
@@ -167,16 +170,16 @@ while running:
 
         # if mouse clicks mute buttons
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if 10 <= event.pos[0] <= 60 and 10 <= event.pos[1] <= 40:
-                mute_theme = not mute_theme
-                if mute_theme:
+            if theme_playing_button.rect.collidepoint(event.pos):
+                theme_playing_button.is_muted = not theme_playing_button.is_muted
+                if theme_playing_button.is_muted:
                     mixer.music.set_volume(0)  # Mute the theme
                 else:
                     mixer.music.set_volume(theme_volume)  # Unmute the theme
 
-            elif 70 <= event.pos[0] <= 120 and 10 <= event.pos[1] <= 40:
-                mute_sound_effects = not mute_sound_effects
-                if mute_sound_effects:
+            if sfx_playing_button.rect.collidepoint(event.pos):
+                sfx_playing_button.is_muted = not sfx_playing_button.is_muted
+                if sfx_playing_button.is_muted:
                     pew_sound.set_volume(0)  # Mute sound effects
                     boom_sound.set_volume(0)
                 else:
@@ -235,7 +238,6 @@ while running:
 
     player(playerX, playerY)
     show_score(textX, textY)
-    draw_mute_buttons()
     pygame.display.update()
 
 pygame.quit()
