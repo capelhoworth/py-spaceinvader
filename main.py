@@ -132,7 +132,7 @@ def isCollision(enemyX, enemyY, bulletX, bulletY):
         return True
     else:
         return False
-    
+
 
 # Game Loop
 running = True
